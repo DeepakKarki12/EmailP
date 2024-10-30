@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Smart Email Response Predictor</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #4a6cf7 0%, #6b46c1 100%);
+      padding: 20px;
+      color: #333;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1400px;
+      display: flex;
+      gap: 24px;
+      padding: 24px;
+      height: 90vh;
+    }
+
+    .compose-section, .preview-section {
+      flex: 1;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .section-header {
+      background: #f8f9fa;
+      padding: 20px;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .section-header h2 {
+      color: #1a1a1a;
+      font-size: 18px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .composer {
+      padding: 20px;
+      flex-grow: 1;
+      overflow-y: auto;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      color: #4a5568;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .input-group input,
+    .input-group textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid #e9ecef;
+      border-radius: 6px;
+      font-size: 15px;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .input-group input:focus,
+    .input-group textarea:focus {
+      outline: none;
+      border-color: #4a6cf7;
+      box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.1);
+    }
+
+    .input-group textarea {
+      height: 280px;
+      resize: vertical;
+    }
+
+    .button {
+      background: #4a6cf7;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .button:hover {
+      background: #3451c6;
+      transform: translateY(-1px);
+    }
+
+    .button:active {
+      transform: translateY(0);
+    }
+
+    .preview-content {
+      padding: 20px;
+      flex-grow: 1;
+      overflow-y: auto;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .preview-content.visible {
+      opacity: 1;
+    }
+
+    .email-preview {
+      background: white;
+      border-radius: 8px;
+      border: 1px solid #e9ecef;
+    }
+
+    .email-body {
+      padding: 20px;
+      color: #4a5568;
+      line-height: 1.6;
+      white-space: pre-line;
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #ffffff;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: none;
+    }
+
+    .loading .spinner {
+      display: block;
+    }
+
+    .loading .button-text {
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .placeholder-text {
+      color: #a0aec0;
+      text-align: center;
+      margin-top: 40px;
+      font-size: 15px;
+    }
+
+    @media (max-width: 1024px) {
+      .container {
+        flex-direction: column;
+        height: auto;
+      }
+      
+      .compose-section, .preview-section {
+        height: auto;
+        min-height: 500px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="compose-section">
+      <div class="section-header">
+        <h2>✉️ Compose Email</h2>
+      </div>
+      
+      <div class="composer">
+        <div class="input-group">
+          <!-- <label for="to">To</label>
+          <input id="to" type="text" placeholder="recipient@example.com" /> -->
+        </div>
+        
+        <div class="input-group">
+          <label for="subject">Subject</label>
+          <input id="subject" type="text" placeholder="Enter email subject" />
+        </div>
+        
+        <div class="input-group">
+          <label for="content">Message</label>
+          <textarea id="content" placeholder="Write your email content here..."></textarea>
+        </div>
+        
+        <button id="predict" class="button">
+          <span class="button-text">Predict Response</span>
+          <div class="spinner"></div>
+          ⚡
+        </button>
+      </div>
+    </div>
+
+    <div class="preview-section">
+      <div class="section-header">
+        <h2>📋 Predicted Response</h2>
+      </div>
+      
+      <div id="previewContent" class="preview-content">
+        <div id="placeholderText" class="placeholder-text">
+          Predicted response will appear here after you submit your email
+        </div>
+        
+        <div id="emailPreview" class="email-preview" style="display: none;">
+          <div id="emailBody" class="email-body">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const predictButton = document.getElementById('predict');
+    const previewContent = document.getElementById('previewContent');
+    const emailPreview = document.getElementById('emailPreview');
+    const placeholderText = document.getElementById('placeholderText');
+    const emailBody = document.getElementById('emailBody');
+
+    predictButton.addEventListener('click', async () => {
+      // const to = document.getElementById('to').value;
+      const subject = document.getElementById('subject').value;
+      const mail = document.getElementById('content').value;
+
+      predictButton.classList.add('loading');
+
+      try {
+        const response = await fetch('http://127.0.0.1:4000//fun', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ subject, mail })
+        });
+
+        const data = await response.json();
+        emailBody.textContent = data.response;
+        
+        placeholderText.style.display = 'none';
+        emailPreview.style.display = 'block';
+        previewContent.classList.add('visible');
+      } catch (error) {
+        emailBody.textContent = 'Error predicting response: ' + error.message;
+        placeholderText.style.display = 'none';
+        emailPreview.style.display = 'block';
+        previewContent.classList.add('visible');
+      } finally {
+        predictButton.classList.remove('loading');
+      }
+    });
+  </script>
+</body>
+</html>
