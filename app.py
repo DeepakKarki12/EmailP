@@ -76,4 +76,4 @@ def processEmailData():
   print("acutal output",response)
   return {"response":response}
 
-app.run(port=4000,debug=True)
+app.run(host='0.0.0.0', port=4000)
