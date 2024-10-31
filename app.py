@@ -7,6 +7,19 @@ from dotenv import load_dotenv
 from flask import Flask, render_template, request
 
 
+from flask_cors import CORS
+
+
+# Set up CORS
+cors = CORS(app, resources={
+    r"/fun": {
+        "origins": ["https://emailp.onrender.com"],
+        "methods": ["POST", "GET"],
+        "supports_credentials": True
+    }
+})
+
+
 load_dotenv()
 sec_key = os.getenv('sec_key')
 repo_id=os.getenv('repo_id')
@@ -22,7 +35,7 @@ def index():
     print(os.getcwd())
     return render_template('index.html')
 
-@app.route('https://emailp.onrender.com/fun', methods=['POST'])
+@app.route('/fun', methods=['POST'])
 def processEmailData():
   data = request.get_json()
   print("processing. . .",data)
