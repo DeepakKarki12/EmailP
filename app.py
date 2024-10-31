@@ -16,7 +16,7 @@ load_dotenv()
 sec_key = os.getenv('sec_key')
 
 api = HfApi()
-response = api.whoami(token=os.getenv("HUGGINGFACE_HUB_TOKEN"))
+response = api.whoami(token=os.getenv("sec_key"))
 print("login",response)
 repo_id=os.getenv('repo_id')
 
