@@ -22,7 +22,7 @@ def index():
     print(os.getcwd())
     return render_template('index.html')
 
-@app.route('/fun', methods=['POST'])
+@app.route('https://emailp.onrender.com//fun', methods=['POST'])
 def processEmailData():
   data = request.get_json()
   print("processing. . .",data)
