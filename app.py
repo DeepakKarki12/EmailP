@@ -2,6 +2,7 @@ import os
 from langchain_huggingface import HuggingFaceEndpoint
 from dotenv import load_dotenv
 from flask import Flask, render_template, request
+from huggingface_hub import HfApi
 
 
 from flask_cors import CORS
@@ -13,6 +14,9 @@ from flask_cors import CORS
 
 load_dotenv()
 sec_key = os.getenv('sec_key')
+
+api = HfApi()
+api.login(token=os.getenv("sec_key"))
 repo_id=os.getenv('repo_id')
 
 sec_key = sec_key
