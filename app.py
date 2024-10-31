@@ -1,6 +1,3 @@
-
-
-
 import os
 from langchain_huggingface import HuggingFaceEndpoint
 from dotenv import load_dotenv
@@ -25,7 +22,7 @@ llm=HuggingFaceEndpoint(repo_id=repo_id,max_length=128,temperature=0.7,token=sec
 
 app = Flask(__name__,template_folder='.')
 cors = CORS(app, resources={
-    r"/fun": {
+    r"/*": {  # This will apply CORS to all routes
         "origins": ["https://emailp.onrender.com"],
         "methods": ["POST", "GET"],
         "supports_credentials": True
