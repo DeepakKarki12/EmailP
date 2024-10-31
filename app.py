@@ -14,15 +14,9 @@ from flask_cors import CORS
 
 load_dotenv()
 sec_key = os.getenv('sec_key')
-
-api = HfApi()
-response = api.whoami(token=os.getenv("sec_key"))
-print("login",response)
 repo_id=os.getenv('repo_id')
+api = HfApi()
 
-sec_key = sec_key
-repo_id=repo_id
-llm=HuggingFaceEndpoint(repo_id=repo_id,max_length=128,temperature=0.7,token=sec_key)
 
 
 app = Flask(__name__,template_folder='.')
@@ -72,6 +66,10 @@ def processEmailData():
   Note :- Generate the output according to example output format only:
   """
 
+  response = api.whoami(token=os.getenv("sec_key"))
+  print("login",response)
+
+  llm=HuggingFaceEndpoint(repo_id=repo_id,max_length=128,temperature=0.7,token=sec_key)
   response = llm.invoke(prompt)
   print("llm output",response)
   try:
