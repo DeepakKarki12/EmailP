@@ -11,13 +11,7 @@ from flask_cors import CORS
 
 
 # Set up CORS
-cors = CORS(app, resources={
-    r"/fun": {
-        "origins": ["https://emailp.onrender.com"],
-        "methods": ["POST", "GET"],
-        "supports_credentials": True
-    }
-})
+
 
 
 load_dotenv()
@@ -30,6 +24,14 @@ llm=HuggingFaceEndpoint(repo_id=repo_id,max_length=128,temperature=0.7,token=sec
 
 
 app = Flask(__name__,template_folder='.')
+cors = CORS(app, resources={
+    r"/fun": {
+        "origins": ["https://emailp.onrender.com"],
+        "methods": ["POST", "GET"],
+        "supports_credentials": True
+    }
+})
+
 @app.route('/')
 def index():
     print(os.getcwd())
